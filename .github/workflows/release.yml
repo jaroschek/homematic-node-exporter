@@ -21,9 +21,11 @@ jobs:
         id: addon_latest
         uses: pozetroninc/github-action-get-latest-release@master
         with:
+          owner: jaroschek
+          repo: homematic-node-exporter
           excludes: prerelease, draft
 
-      - name: Get latest node exporterrelease
+      - name: Get latest node exporter release
         id: node_exporter_latest
         uses: pozetroninc/github-action-get-latest-release@master
         with:
