@@ -51,13 +51,21 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Download assets
-      id: download_assets
+    - name: Download assets for AMD64
+      id: download_assets_amd64
       uses: robinraju/release-downloader@v1
       with:
         repository: 'prometheus/node_exporter'
         tag: ${{ needs.check.outputs.node_exporter_release }}
-        fileName: 'node_exporter*.tar.gz'
+        fileName: 'node_exporter*linux-amd64.tar.gz'
+
+    - name: Download assets for ARM
+      id: download_assets_arm
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: 'prometheus/node_exporter'
+        tag: ${{ needs.check.outputs.node_exporter_release }}
+        fileName: 'node_exporter*linux-arm*.tar.gz'
 
     - name: Create assets
       id: create_assets
