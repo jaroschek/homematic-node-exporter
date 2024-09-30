@@ -6,65 +6,81 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  check:
     runs-on: ubuntu-latest
+
+    outputs:
+      addon_release: ${{ steps.addon_latest.outputs.release }}
+      node_exporter_release: ${{ steps.node_exporter_latest.outputs.release }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Get latest release
-        id: get_release
+      - name: Get latest addon release
+        id: addon_latest
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          excludes: prerelease, draft
+
+      - name: Get latest node exporterrelease
+        id: node_exporter_latest
         uses: pozetroninc/github-action-get-latest-release@master
         with:
           owner: prometheus
           repo: node_exporter
           excludes: prerelease, draft
 
-      - name: Create release
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.get_release.outputs.release }}
-          name: Release ${{ steps.get_release.outputs.release }}
-          body: |
-            Changes in this Release
-            - Updates node exporter binary to version ${{ steps.get_release.outputs.release }}
-          draft: false
-          prerelease: false
+  release:
+    needs: check
+    if: "${{ needs.check.outputs.addon_release != needs.check.outputs.node_exporter_release }}"
+    runs-on: ubuntu-latest
 
-      - name: Download release
-        id: download_release
-        uses: robinraju/release-downloader@v1
-        with:
-          tag: ${{ steps.get_release.outputs.release }}
-          tarBall: true
-          extract: true
+    steps:
+    - name: Create release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ needs.check.outputs.node_exporter_release }}
+        name: Release ${{ needs.check.outputs.node_exporter_release }}
+        body: |
+          Changes in this Release
+          - Updates node exporter binary to version ${{ needs.check.outputs.node_exporter_release }}
+        draft: false
+        prerelease: false
 
-      - name: Download assets
-        id: download_assets
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: 'prometheus/node_exporter'
-          tag: ${{ steps.get_release.outputs.release }}
-          fileName: 'node_exporter*.tar.gz'
+    - name: Download release
+      id: download_release
+      uses: robinraju/release-downloader@v1
+      with:
+        tag: ${{ needs.check.outputs.node_exporter_release }}
+        tarBall: true
+        extract: true
 
-      - name: Create assets
-        id: create_assets
-        run: |
-          for file in node_exporter*.tar.gz; do
-            filename=${file##*/}
-            tar -xzvf $file
-            rm $file
-            mkdir -p ${{ steps.get_release.outputs.release }}/bin
-            mv $filename/node_exporter ${{ steps.get_release.outputs.release }}bin/node_exporter
-            tar -czvf $file ${{ steps.get_release.outputs.release }}
-          done;
+    - name: Download assets
+      id: download_assets
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: 'prometheus/node_exporter'
+        tag: ${{ needs.check.outputs.node_exporter_release }}
+        fileName: 'node_exporter*.tar.gz'
 
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          file_glob: true
-          file: node_exporter*.tar.gz
-          tag: ${{ steps.get_release.outputs.release }}
-          overwrite: true
+    - name: Create assets
+      id: create_assets
+      run: |
+        for file in node_exporter*.tar.gz; do
+          filename=${file##*/}
+          tar -xzvf $file
+          rm $file
+          mkdir -p ${{ needs.check.outputs.node_exporter_release }}/bin
+          mv $filename/node_exporter ${{ needs.check.outputs.node_exporter_release }}bin/node_exporter
+          tar -czvf $file ${{ needs.check.outputs.node_exporter_release }}
+        done;
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        file_glob: true
+        file: node_exporter*.tar.gz
+        tag: ${{ needs.check.outputs.node_exporter_release }}
+        overwrite: true
