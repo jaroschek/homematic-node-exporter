@@ -47,7 +47,7 @@ case "$1" in
     echo "Info: <center><b>Prometheus Node Exporter</b><br></center>"
     echo "Info: <center><a href=\"https://prometheus.io/docs/guides/node-exporter/\" target=\"_blank\"><img height=\"32\" width=\"32\" src=\"/addons/${ADDONNAME}/logo.svg\"></a></center>"
     echo "Name: Prometheus Node Exporter"
-    echo "Operations: uninstall"
+    echo "Operations: uninstall restart"
     echo "Update: /addons/${ADDONNAME}/update-check.cgi"
     echo "Version: $(cat ${WWW_DIR}/VERSION)"
     ;;
