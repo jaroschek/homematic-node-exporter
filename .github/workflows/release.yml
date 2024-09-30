@@ -70,14 +70,16 @@ jobs:
       id: create_assets
       run: |
         for release in homematic-node-exporter-*.tar.gz; do
+          mkdir -p asset
           tar -xzvf $release -C asset
           rm $release
           mkdir -p asset/bin
           for file in node_exporter*.tar.gz; do
             tar -xzvf $file node_exporter -C asset/bin
             rm $file
-            tar -czvf homematic-$file asset
+            tar -czvf homematic-$file asset/*
           done;
+          rm -fr asset
         done;
 
     - name: Upload binaries to release
