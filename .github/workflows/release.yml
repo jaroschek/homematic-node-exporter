@@ -78,7 +78,7 @@ jobs:
           rm $file
           mv source/*/node_exporter bin/node_exporter
           rm -fr source 
-          tar -czvf homematic-$file bin/* rc.d/* www/*
+          tar -czvf homematic-$file bin/* rc.d/* www/* update_script
         done;
 
     - name: Upload binaries to release
