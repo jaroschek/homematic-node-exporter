@@ -1,6 +1,8 @@
 name: Check for new release of prometheus node exporter and create new release of addon
 
 on:
+  schedule:
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
@@ -23,10 +25,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ release }}
-          release_name: Release ${{ release }}
+          tag_name: ${{ steps.get_release.outputs.release }}
+          release_name: Release ${{ steps.get_release.outputs.release }}
           body: |
             Changes in this Release
-            - Updates node exporter binary to version ${{ release }}
+            - Updates node exporter binary to version ${{ steps.get_release.outputs.release }}
           draft: false
           prerelease: false
