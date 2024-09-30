@@ -75,7 +75,7 @@ jobs:
           rm $release
           mkdir -p asset/bin
           for file in node_exporter*.tar.gz; do
-            tar -xzvf $file */node_exporter -C asset/bin
+            tar --wildcards -xzvf $file */node_exporter -C asset/bin
             rm $file
             tar -czvf homematic-$file asset/*
           done;
