@@ -12,7 +12,7 @@ fi
 
 Stop () {
     echo -n "Stopping node-exporter: "
-    killall node_exporter echo "OK"
+    killall node_exporter && echo "OK"
 }
 
 Start () {
@@ -22,7 +22,7 @@ Start () {
       ln -s $WWW_DIR /www/config/${ADDONNAME}
       mount -o remount,ro /
     fi
-    $ADDON_DIR/node_exporter &
+    nohup $ADDON_DIR/node_exporter >/dev/null 2>&1 &
     echo "OK"
 }
 
