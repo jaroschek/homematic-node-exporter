@@ -69,20 +69,14 @@ jobs:
     - name: Create assets
       id: create_assets
       run: |
-        for release in homematic-node-exporter-*.tar.gz; do
-          mkdir -p target
-          tar -xzvf $release -C target
-          rm $release
-          mkdir -p target/bin
-          for file in node_exporter*.tar.gz; do
-            mkdir -p source
-            tar -xzvf $file -C source
-            rm $file
-            mv source/*/node_exporter target/bin/node_exporter
-            rm -fr source 
-            tar -czvf homematic-$file target/*
-          done;
-          rm -fr asset
+        mkdir -p bin
+        for file in node_exporter*.tar.gz; do
+          mkdir -p source
+          tar -xzvf $file -C source
+          rm $file
+          mv source/*/node_exporter target/bin/node_exporter
+          rm -fr source 
+          tar -czvf homematic-$file bin/* rc.d/* www/*
         done;
 
     - name: Upload binaries to release
