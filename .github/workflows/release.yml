@@ -51,13 +51,6 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Download release
-      id: download_release
-      uses: robinraju/release-downloader@v1
-      with:
-        tag: ${{ needs.check.outputs.node_exporter_release }}
-        tarBall: true
-
     - name: Download assets
       id: download_assets
       uses: robinraju/release-downloader@v1
