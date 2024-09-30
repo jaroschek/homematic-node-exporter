@@ -1,0 +1,32 @@
+name: Check for new release of prometheus node exporter and create new release of addon
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - id: get_release
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          owner: prometheus
+          repo: node_exporter
+          excludes: prerelease, draft
+
+      - id: create_release
+        uses: comnoco/create-release-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ release }}
+          release_name: Release ${{ release }}
+          body: |
+            Changes in this Release
+            - Updates node exporter binary to version ${{ release }}
+          draft: false
+          prerelease: false
