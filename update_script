@@ -22,12 +22,12 @@ if [ -f $RCD_DIR/node-exporter ]; then
     $RCD_DIR/node-exporter stop
 fi
 
-cp -f bin/node_exporter $ADDON_DIR
+cp -f bin/node_exporter $ADDON_DIR/
 chmod +x $ADDON_DIR/node_exporter
-cp -f rc.d/node-exporter $RCD_DIR
+cp -f rc.d/node-exporter $RCD_DIR/
 chmod +x $RCD_DIR/node-exporter
 mkdir -p $WWW_DIR
-cp -f www/* $WWW_DIR
+cp -f www/* $WWW_DIR/
 
 if [ $EXITCODE -eq 0 ]; then
     $RCD_DIR/node-exporter start
