@@ -32,3 +32,39 @@ jobs:
             - Updates node exporter binary to version ${{ steps.get_release.outputs.release }}
           draft: false
           prerelease: false
+
+      - name: Download release
+        id: download_release
+        uses: robinraju/release-downloader@v1
+        with:
+          tag: ${{ steps.get_release.outputs.release }}
+          tarBall: true
+          extract: true
+
+      - name: Download assets
+        id: download_assets
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: 'prometheus/node_exporter'
+          tag: ${{ steps.get_release.outputs.release }}
+          fileName: 'node_exporter*.tar.gz'
+
+      - name: Create assets
+        id: create_assets
+        run: |
+          for file in node_exporter*.tar.gz; do
+            filename=${file##*/}
+            tar -xzvf $file
+            rm $file
+            mkdir -p ${{ steps.get_release.outputs.release }}/bin
+            mv $filename/node_exporter ${{ steps.get_release.outputs.release }}bin/node_exporter
+            tar -czvf $file ${{ steps.get_release.outputs.release }}
+          done;
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file_glob: true
+          file: node_exporter*.tar.gz
+          tag: ${{ steps.get_release.outputs.release }}
+          overwrite: true
