@@ -13,7 +13,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - id: get_release
+      - name: Get latest Release
+        id: get_release
         uses: pozetroninc/github-action-get-latest-release@master
         with:
           owner: prometheus
@@ -21,7 +22,7 @@ jobs:
           excludes: prerelease, draft
 
       - id: create_release
-        uses: comnoco/create-release-action@v2
+        uses: comnoco/create-release-action@v2.0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
