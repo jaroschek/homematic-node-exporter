@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Get latest Release
+      - name: Get latest release
         id: get_release
         uses: pozetroninc/github-action-get-latest-release@master
         with:
@@ -21,8 +21,9 @@ jobs:
           repo: node_exporter
           excludes: prerelease, draft
 
-      - id: create_release
-        uses: comnoco/create-release-action@v2.0.5
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
