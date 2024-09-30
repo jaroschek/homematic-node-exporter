@@ -57,7 +57,6 @@ jobs:
       with:
         tag: ${{ needs.check.outputs.node_exporter_release }}
         tarBall: true
-        extract: true
 
     - name: Download assets
       id: download_assets
@@ -70,19 +69,21 @@ jobs:
     - name: Create assets
       id: create_assets
       run: |
-        for file in node_exporter*.tar.gz; do
-          filename=${file##*/}
-          tar -xzvf $file
-          rm $file
-          mkdir -p ${{ needs.check.outputs.node_exporter_release }}/bin
-          mv $filename/node_exporter ${{ needs.check.outputs.node_exporter_release }}bin/node_exporter
-          tar -czvf $file ${{ needs.check.outputs.node_exporter_release }}
+        for release in homematic-node-exporter*.tar.gz; do
+          tar -xzvf release -C asset
+          rm release
+          mkdir -p asset/bin
+          for file in node_exporter*.tar.gz; do
+            tar -xzvf $file node_exporter -C asset/bin
+            rm $file
+            tar -czvf homematic-$file asset
+          done;
         done;
 
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         file_glob: true
-        file: node_exporter*.tar.gz
+        file: homematic-*.tar.gz
         tag: ${{ needs.check.outputs.node_exporter_release }}
         overwrite: true
