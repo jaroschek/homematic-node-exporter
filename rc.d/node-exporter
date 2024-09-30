@@ -1,0 +1,74 @@
+#!/bin/sh
+
+ADDONNAME=node-exporter
+ADDON_DIR=/usr/local/addons/${ADDONNAME}
+WWW_DIR=/usr/local/etc/config/addons/www/${ADDONNAME}
+RCD_DIR=/usr/local/etc/config/rc.d
+
+# check for unsupported platforms
+if grep -qim1 busmatic /www/api/methods/ccu/downloadFirmware.tcl; then
+  exit 13
+fi
+
+Stop () {
+    echo -n "Stopping node-exporter: "
+    killall node-exporter echo "OK"
+}
+
+Start () {
+    echo -n "Starting node-exporter: "
+    if [ ! -e /www/config/${ADDONNAME} ]; then
+      mount -o remount,rw /
+      ln -s $WWW_DIR /www/config/${ADDONNAME}
+      mount -o remount,ro /
+    fi
+    $ADDON_DIR/node-exporter &
+    echo "OK"
+}
+
+case "$1" in
+
+  stop)
+    Stop
+    ;;
+
+  start)
+    Start
+    ;;
+
+  restart)
+    Stop
+    sleep 3
+    Start
+    ;;
+
+  info)
+
+    echo "Info: <center><b>Prometheus Node Exporter Addon</b><br></center>"
+    echo "Info: <center><a href=\"https://prometheus.io/docs/guides/node-exporter/\" target=\"_blank\"><img height=\"32\" width=\"32\" src=\"/addons/${ADDONNAME}/logo.svg\"></a></center>"
+    echo "Name: Prometheus Node Exporter"
+    echo "Operations: uninstall"
+    echo "Update: /addons/${ADDONNAME}/update_check.cgi"
+    echo "Version: $(cat ${WWW_DIR}/VERSION)"
+    ;;
+
+  uninstall)
+    /usr/bin/killall node-exporter
+    rm $CONF_DIR/rc.d/${ADDONNAME}
+    if [ -e /www/config/${ADDONNAME} ]; then
+      mount -o remount,rw /
+      rm -f /www/config/${ADDONNAME}
+      mount -o remount,ro /
+    fi
+
+    rm -r $ADDON_DIR
+    rm -r $WWW_DIR
+    rm -f ${RCD_DIR}/${ADDONNAME}
+    ;;
+
+  *)
+    echo "Usage: node-exporter {start|stop|restart|info|uninstall}" >&2
+    exit 1
+    ;;
+
+esac
