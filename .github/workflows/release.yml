@@ -74,7 +74,7 @@ jobs:
           mkdir -p source
           tar -xzvf $file -C source
           rm $file
-          mv source/*/node_exporter target/bin/node_exporter
+          mv source/*/node_exporter bin/node_exporter
           rm -fr source 
           tar -czvf homematic-$file bin/* rc.d/* www/*
         done;
