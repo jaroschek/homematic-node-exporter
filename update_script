@@ -1,0 +1,37 @@
+#!/bin/sh
+
+ADDON_DIR=/usr/local/addons/node-exporter
+RCD_DIR=/usr/local/etc/config/rc.d/
+WWW_DIR=/usr/local/etc/config/addons/www/node-exporter
+EXITCODE=10
+
+mount | grep /usr/local 2>&1 >/dev/null
+if [ $? -eq 1 ]; then
+  mount /usr/local
+fi
+
+mkdir -p $ADDON_DIR
+chmod 755 $ADDON_DIR
+mkdir -p $RCD_DIR
+chmod 755 $RCD_DIR
+mkdir -p $WWW_DIR
+chmod 755 $$WWW_DIR
+
+if [ -f $RCD_DIR/node-exporter ]; then
+    EXITCODE=0
+    $RCD_DIR/node-exporter stop
+fi
+
+cp -f bin/node_exporter $ADDON_DIR
+chmod +x $ADDON_DIR/node_exporter
+cp -f rc.d/node-exporter $RCD_DIR
+chmod +x $RCD_DIR/node-exporter
+mkdir -p $WWW_DIR
+cp -f www/* $WWW_DIR
+
+if [ $EXITCODE -eq 0 ]; then
+    $RCD_DIR/node-exporter start
+fi
+
+sync
+exit $EXITCODE
