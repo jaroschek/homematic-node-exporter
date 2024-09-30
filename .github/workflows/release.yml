@@ -14,9 +14,6 @@ jobs:
       node_exporter_release: ${{ steps.node_exporter_latest.outputs.release }}
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
       - name: Get latest addon release
         id: addon_latest
         uses: pozetroninc/github-action-get-latest-release@master
@@ -39,6 +36,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
     - name: Create release
       id: create_release
       uses: softprops/action-gh-release@v2
